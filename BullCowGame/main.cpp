@@ -1,14 +1,25 @@
+/*
+This is the console executable, that makes use of the BullCow class
+This acts as the view in a MVC pattern, and is responsible for all user 
+interaction. For game logic see the FBullCowGame class.
+*/
+
 #include <iostream>
 #include <string>
+#include "FBullCowGame.h"
 
-using namespace std;
+using FText = std::string;
+using int32 = int;
 
 void playGame();
 void printIntro();
-string getGuess();
+FText getGuess();
 bool askToPlayAgain();
 
+FBullCowGame BCGame;	// instantiate a new game
+
 int main() {
+	std::cout << BCGame.getCurrentTry();
 	bool bPlayAgain = false;
 	do {
 		printIntro();
@@ -20,30 +31,37 @@ int main() {
 
 void printIntro() {
 	constexpr int word_length = 9;
-	cout << "Welcome to Bulls and Cows\n";
-	cout << "Can you guess the " << word_length << " letter isogram I'm thinking of?\n\n";
+	std::cout << "Welcome to Bulls and Cows\n";
+	std::cout << "Can you guess the " << word_length << " letter isogram I'm thinking of?\n\n";
 	return;
 }
 
 void playGame() {
-	constexpr int number_of_turns = 5;
-	for (int i = 1; i <= number_of_turns; i++) {
-		string guess = getGuess();
-		cout << "You guessed " << guess << endl;
+	BCGame.reset();
+	int maxTries = BCGame.getMaxTries();
+	for (int i = 1; i <= maxTries; i++) {
+		FText guess = getGuess(); // TODO check for valid guess
+
+		// Submit valid guess to the game
+		FBullCowCount bullCowCount = BCGame.submitGuess(guess);
+		// Print number of bulls and cows
+		std::cout << "Bulls = " << bullCowCount.bulls << " Cows = " << bullCowCount.cows << std::endl;
+		std::cout << "You guessed " << guess << std::endl;
 	}
-	return;
+	// TODO add a game summary at end
 }
 
-string getGuess() {
-	string Guess = "";
-	cout << "Enter your guess: ";
-	getline(cin, Guess);
+FText getGuess() {
+	int currentTry = BCGame.getCurrentTry();
+	FText Guess = "";
+	std::cout << "Try " << currentTry << " Enter your guess: ";
+	std::getline(std::cin, Guess);
 	return Guess;
 }
 
 bool askToPlayAgain() {
-	cout << "Do you want to play again (y/n)?";
-	string response = "";
-	getline(cin, response);
+	std::cout << "Do you want to play again (y/n)?";
+	FText response = "";
+	std::getline(std::cin, response);
 	return (response[0] == 'y' || response[0] == 'Y');
 }
