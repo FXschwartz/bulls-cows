@@ -13,13 +13,14 @@ using int32 = int;
 
 void playGame();
 void printIntro();
-FText getGuess();
+void printGameSummary();
+FText getValidGuess();
 bool askToPlayAgain();
 
 FBullCowGame BCGame;	// instantiate a new game
 
 int main() {
-	std::cout << BCGame.getCurrentTry();
+	//std::cout << BCGame.getCurrentTry();
 	bool bPlayAgain = false;
 	do {
 		printIntro();
@@ -30,37 +31,62 @@ int main() {
 }
 
 void printIntro() {
-	constexpr int word_length = 9;
-	std::cout << "Welcome to Bulls and Cows\n";
-	std::cout << "Can you guess the " << word_length << " letter isogram I'm thinking of?\n\n";
+	std::cout << std::endl << "Welcome to Bulls and Cows\n";
+	std::cout << "Can you guess the " << BCGame.getHiddenWordLength() << " letter isogram I'm thinking of?\n\n";
 	return;
 }
 
 void playGame() {
 	BCGame.reset();
-	int maxTries = BCGame.getMaxTries();
-	for (int i = 1; i <= maxTries; i++) {
-		FText guess = getGuess(); // TODO check for valid guess
+	int32 maxTries = BCGame.getMaxTries();
+	while(!BCGame.isGameWon() && BCGame.getCurrentTry() <= maxTries) {
+		FText guess = getValidGuess();
 
 		// Submit valid guess to the game
-		FBullCowCount bullCowCount = BCGame.submitGuess(guess);
+		FBullCowCount bullCowCount = BCGame.submitValidGuess(guess);
+
 		// Print number of bulls and cows
 		std::cout << "Bulls = " << bullCowCount.bulls << " Cows = " << bullCowCount.cows << std::endl;
-		std::cout << "You guessed " << guess << std::endl;
-	}
-	// TODO add a game summary at end
+	} 
+	printGameSummary();
 }
 
-FText getGuess() {
-	int currentTry = BCGame.getCurrentTry();
-	FText Guess = "";
-	std::cout << "Try " << currentTry << " Enter your guess: ";
-	std::getline(std::cin, Guess);
-	return Guess;
+FText getValidGuess() {
+	EGuessStatus status = EGuessStatus::invalidStatus;
+	FText guess = "";
+	do {
+		int32 currentTry = BCGame.getCurrentTry();
+		
+		std::cout << "Try " << currentTry << " Enter your guess: ";
+		std::getline(std::cin, guess);
+
+		status = BCGame.checkGuessValidity(guess);
+		switch(status) {
+		case EGuessStatus::wrongLength:
+			std::cout << "Please enter a " << BCGame.getHiddenWordLength() << " word." << std::endl;
+			break;
+		case EGuessStatus::notIsogram:
+			std::cout << "Please enter an Isogram. (A word without repeating letters)" << std::endl;
+			break;
+		case EGuessStatus::notLowerCase:
+			std::cout << "Please enter all lowercase letters" << std::endl;
+			break;
+		default:
+			return guess;
+		};
+		std::cout << std::endl;
+	} while(status != EGuessStatus::ok);
+	return guess;
+}
+
+void printGameSummary() {
+	if(BCGame.isGameWon()) std::cout << "Congrats! You Won!" << std::endl;
+	else std::cout << "Awkward, Suck Less Next Time!" << std::endl;
+	return;
 }
 
 bool askToPlayAgain() {
-	std::cout << "Do you want to play again (y/n)?";
+	std::cout << "Do you want to play again with the same hidden word (y/n)?";
 	FText response = "";
 	std::getline(std::cin, response);
 	return (response[0] == 'y' || response[0] == 'Y');
