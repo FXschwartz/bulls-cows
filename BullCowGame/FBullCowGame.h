@@ -1,10 +1,10 @@
 #pragma once
 #include <string>
 
+// Make syntax Unreal friendly
 using FString = std::string;
 using int32 = int;
 
-// All values set to zero
 struct FBullCowCount {
 	int32 bulls = 0;
 	int32 cows = 0;
@@ -27,16 +27,16 @@ public:
 	int32 getHiddenWordLength() const;
 	bool isGameWon() const;
 
-	void reset(); // TODO make a better return value
+	void reset();
 	EGuessStatus checkGuessValidity(FString) const;
 	FBullCowCount submitValidGuess(FString);
 
 private:
 	// See constructor for initial values
 	int32 myCurrentTry;
-	int32 myMaxTries;
 	FString myHiddenWord;
 	bool bGameIsWon;
 
 	bool isIsogram(FString) const;
+	bool isLowerCase(FString) const;
 };

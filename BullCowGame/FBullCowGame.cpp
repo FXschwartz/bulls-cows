@@ -1,20 +1,24 @@
+#pragma once
 #include "FBullCowGame.h"
 #include <map>
 #define TMap std::map
 
+// Make syntax Unreal friendly
 using int32 = int;
 
 FBullCowGame::FBullCowGame() { reset(); }
 
-int32 FBullCowGame::getMaxTries() const { return myMaxTries; }
 int32 FBullCowGame::getCurrentTry() const { return myCurrentTry; }
 int32 FBullCowGame::getHiddenWordLength() const { return myHiddenWord.length(); }
 bool FBullCowGame::isGameWon() const { return bGameIsWon; }
 
+int32 FBullCowGame::getMaxTries() const {
+	TMap<int32, int32> wordLengthToMaxTries{{3,4},{4,7},{5,10},{6,15},{7,20}};
+	return wordLengthToMaxTries[myHiddenWord.length()];
+}
+
 void FBullCowGame::reset() {
-	const FString hidden_word = "clear";
-	constexpr int32 max_tries = 8;
-	myMaxTries = max_tries;
+	const FString hidden_word = "clear"; // This must be an isogram
 	myHiddenWord = hidden_word;
 	bGameIsWon = false;
 	myCurrentTry = 1;
@@ -26,17 +30,15 @@ EGuessStatus FBullCowGame::checkGuessValidity(FString guess) const {
 	if(!isIsogram(guess)) {
 		return EGuessStatus::notIsogram;
 	}
+	else if(!isLowerCase(guess)) {
+		return EGuessStatus::notLowerCase;
+	}
 	else if(guess.length() != getHiddenWordLength()) {
 		return EGuessStatus::wrongLength;
-	}
-	else if(false) {
-		return EGuessStatus::notLowerCase;
 	}
 	else {
 		return EGuessStatus::ok;
 	}
-	//return EGuessStatus::wrongLength;
-
 }
 
 // Recieves a VALID guess, increments turn, and returns count;
@@ -70,6 +72,13 @@ bool FBullCowGame::isIsogram(FString guess) const {
 			currentLetter[letter] = true;
 		}
 	}
+	return true;
+}
 
+bool FBullCowGame::isLowerCase(FString guess) const {
+	if(guess.length() <= 1) return true;
+	for(auto letter : guess) {
+		if(!islower(letter)) return false;
+	}
 	return true;
 }

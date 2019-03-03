@@ -1,13 +1,9 @@
-/*
-This is the console executable, that makes use of the BullCow class
-This acts as the view in a MVC pattern, and is responsible for all user 
-interaction. For game logic see the FBullCowGame class.
-*/
-
+#pragma once
 #include <iostream>
 #include <string>
 #include "FBullCowGame.h"
 
+// Make syntax Unreal friendly
 using FText = std::string;
 using int32 = int;
 
@@ -20,7 +16,6 @@ bool askToPlayAgain();
 FBullCowGame BCGame;	// instantiate a new game
 
 int main() {
-	//std::cout << BCGame.getCurrentTry();
 	bool bPlayAgain = false;
 	do {
 		printIntro();
@@ -31,7 +26,13 @@ int main() {
 }
 
 void printIntro() {
-	std::cout << std::endl << "Welcome to Bulls and Cows\n";
+	std::cout << std::endl << "Welcome to Bulls and Cows" << std::endl;
+	std::cout << "          }   {         ___ "  << std::endl;
+	std::cout << "          (o o)        (o o) " << std::endl;
+	std::cout << "   /-------\\ /          \\ /-------\\ " << std::endl;
+	std::cout << "  / | BULL |O            O| COW  | \\ " << std::endl;
+	std::cout << " *  |-,--- |              |------|  * " << std::endl;
+	std::cout << "    ^      ^              ^      ^ " << std::endl;
 	std::cout << "Can you guess the " << BCGame.getHiddenWordLength() << " letter isogram I'm thinking of?\n\n";
 	return;
 }
@@ -46,7 +47,7 @@ void playGame() {
 		FBullCowCount bullCowCount = BCGame.submitValidGuess(guess);
 
 		// Print number of bulls and cows
-		std::cout << "Bulls = " << bullCowCount.bulls << " Cows = " << bullCowCount.cows << std::endl;
+		std::cout << "Bulls = " << bullCowCount.bulls << " Cows = " << bullCowCount.cows << std::endl << std::endl;
 	} 
 	printGameSummary();
 }
@@ -56,8 +57,8 @@ FText getValidGuess() {
 	FText guess = "";
 	do {
 		int32 currentTry = BCGame.getCurrentTry();
-		
-		std::cout << "Try " << currentTry << " Enter your guess: ";
+
+		std::cout << "Try " << currentTry << " of " << BCGame.getMaxTries() << " Enter your guess: ";
 		std::getline(std::cin, guess);
 
 		status = BCGame.checkGuessValidity(guess);
